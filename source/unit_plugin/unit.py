@@ -12,13 +12,14 @@ class Unit(Process):
     def __init__(self, cwd, name, path, filename, arguments, format):
         super(Unit, self).__init__(cwd, name)
         self.duration = 0
-        self.type = 'makefile'
+        self.type = 'unit'
         self.path = path
         self.cwd = os.path.join(self.cwd, self.path)
         self.filename = filename
         self.arguments = arguments
         self.parser = XMLParser(format)
     
+    @Process.error_checks
     def process(self, verbose=False, warning_as_error=False):
         if not os.path.isfile(os.path.join(self.cwd, self.filename)):
             raise PyvenException('Test file not found : ' + os.path.join(self.path, self.filename))
@@ -50,7 +51,9 @@ class Unit(Process):
         Logger.get().error('Unknown directory : ' + self.path)
         return False
     
-    def clean(self, verbose=False):
+    @Process.error_checks
+    def clean(self, verbose=False, warning_as_error=False):
+        self.status = pyven.constants.STATUS[0]
         return True
         
     def report_summary(self):
